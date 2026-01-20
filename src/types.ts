@@ -24,8 +24,8 @@ export interface Config {
 // Token storage
 export interface StoredTokens {
     accessToken: string;
-    refreshToken: string;
-    expiryDate: number;
+    refreshToken?: string;
+    expiryDate?: number;
 }
 
 // AdSense Account

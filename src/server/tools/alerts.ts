@@ -21,12 +21,13 @@ export async function handleListAlerts(args: Record<string, unknown>) {
 
     // Format alerts with severity emoji
     const formatAlert = (alert: any) => {
-        const severityEmoji = {
+        const severityEmojiMap: Record<string, string> = {
             'SEVERE': '🔴',
             'WARNING': '🟡',
             'INFO': '🔵',
             'SEVERITY_UNSPECIFIED': '⚪',
-        }[alert.severity] || '⚪';
+        };
+        const severityEmoji = severityEmojiMap[alert.severity] || '⚪';
 
         return {
             message: alert.message,
@@ -64,14 +65,15 @@ export async function handleListPolicyIssues(args: Record<string, unknown>) {
 
     // Format policy issues with action emoji
     const formatIssue = (issue: any) => {
-        const actionEmoji = {
+        const actionEmojiMap: Record<string, string> = {
             'WARNED': '⚠️',
             'AD_SERVING_RESTRICTED': '🔶',
             'AD_SERVING_DISABLED': '🔴',
             'AD_SERVED_WITH_CLICK_CONFIRMATION': '🟡',
             'AD_PERSONALIZATION_RESTRICTED': '🟠',
             'ENFORCEMENT_ACTION_UNSPECIFIED': '⚪',
-        }[issue.action] || '⚪';
+        };
+        const actionEmoji = actionEmojiMap[issue.action] || '⚪';
 
         return {
             site: issue.site,

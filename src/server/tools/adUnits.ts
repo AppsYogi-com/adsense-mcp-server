@@ -14,11 +14,12 @@ export async function handleListAdUnits(args: Record<string, unknown>) {
 
     // Format ad units
     const formatAdUnit = (unit: any) => {
-        const stateEmoji = {
+        const stateEmojiMap: Record<string, string> = {
             'ACTIVE': '✅',
             'ARCHIVED': '📦',
             'STATE_UNSPECIFIED': '❓',
-        }[unit.state] || '❓';
+        };
+        const stateEmoji = stateEmojiMap[unit.state] || '❓';
 
         // Extract ad client ID and ad unit ID from name
         // Format: accounts/{pub-id}/adclients/{ad-client-id}/adunits/{ad-unit-id}

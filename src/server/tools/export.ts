@@ -22,7 +22,7 @@ export async function handleExportCsv(args: Record<string, unknown>) {
     // Try to get CSV directly from API
     try {
         const csvData = await client.generateCsvReport({
-            accountId,
+            accountId: accountId || '',
             startDate,
             endDate,
             dimensions: (args.dimensions as ReportDimension[]) || undefined,
@@ -37,7 +37,7 @@ export async function handleExportCsv(args: Record<string, unknown>) {
     } catch {
         // Fall back to generating CSV from JSON report
         const report = await client.generateReport({
-            accountId,
+            accountId: accountId || '',
             startDate,
             endDate,
             dimensions: (args.dimensions as ReportDimension[]) || undefined,

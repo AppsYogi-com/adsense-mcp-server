@@ -124,9 +124,9 @@ async function performOAuthFlow(clientId: string, clientSecret: string): Promise
 
         // Save tokens securely
         await saveTokens({
-            accessToken: tokens.access_token,
-            refreshToken: tokens.refresh_token || undefined,
-            expiryDate: tokens.expiry_date || undefined,
+            accessToken: tokens.access_token!,
+            refreshToken: tokens.refresh_token ?? undefined,
+            expiryDate: tokens.expiry_date ?? undefined,
         });
 
         console.log('\n✅ Authentication successful!');

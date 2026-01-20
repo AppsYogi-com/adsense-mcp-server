@@ -85,12 +85,12 @@ export async function handleGenerateReport(args: Record<string, unknown>) {
     const startDate = args.startDate as string || get7DaysAgo();
 
     const report = await client.generateReport({
-        accountId,
+        accountId: accountId || '',
         startDate,
         endDate,
         dimensions: (args.dimensions as ReportDimension[]) || undefined,
         metrics: (args.metrics as ReportMetric[]) || undefined,
-        orderBy: args.orderBy as string,
+        orderBy: (args.orderBy as string) || undefined,
         limit: (args.limit as number) || 100,
     });
 
@@ -139,13 +139,13 @@ export async function handleComparePeriods(args: Record<string, unknown>) {
     // Fetch both periods
     const [report1, report2] = await Promise.all([
         client.generateReport({
-            accountId,
+            accountId: accountId || '',
             startDate: period1Start,
             endDate: period1End,
             dimensions,
         }),
         client.generateReport({
-            accountId,
+            accountId: accountId || '',
             startDate: period2Start,
             endDate: period2End,
             dimensions,

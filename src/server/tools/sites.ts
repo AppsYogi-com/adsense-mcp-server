@@ -22,13 +22,14 @@ export async function handleListSites(args: Record<string, unknown>) {
 
     // Format sites with status emoji
     const formatSite = (site: any) => {
-        const statusEmoji = {
+        const statusEmojiMap: Record<string, string> = {
             'READY': '✅',
             'GETTING_READY': '⏳',
             'NEEDS_ATTENTION': '⚠️',
             'REQUIRES_REVIEW': '📝',
             'STATE_UNSPECIFIED': '❓',
-        }[site.state] || '❓';
+        };
+        const statusEmoji = statusEmojiMap[site.state] || '❓';
 
         return {
             domain: site.domain,
