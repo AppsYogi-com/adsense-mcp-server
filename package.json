@@ -1,0 +1,69 @@
+{
+    "name": "@appsyogi/adsense-mcp-server",
+    "version": "0.1.0",
+    "description": "Google AdSense MCP Server - Monitor earnings, reports, and account health via Claude/AI",
+    "type": "module",
+    "main": "./dist/index.js",
+    "bin": {
+        "adsense-mcp": "./dist/cli/index.js"
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "start": "node dist/cli/index.js",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint src/",
+        "prepublishOnly": "npm run build"
+    },
+    "keywords": [
+        "mcp",
+        "google-adsense",
+        "adsense",
+        "earnings",
+        "publisher",
+        "model-context-protocol",
+        "claude",
+        "cursor",
+        "ai",
+        "monetization"
+    ],
+    "author": "SuperZero11",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AppsYogi-com/adsense-mcp-server.git"
+    },
+    "bugs": {
+        "url": "https://github.com/AppsYogi-com/adsense-mcp-server/issues"
+    },
+    "homepage": "https://github.com/AppsYogi-com/adsense-mcp-server#readme",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.25.0",
+        "better-sqlite3": "^11.0.0",
+        "chalk": "^5.3.0",
+        "commander": "^12.0.0",
+        "env-paths": "^3.0.0",
+        "googleapis": "^140.0.0",
+        "keytar": "^7.9.0",
+        "open": "^10.0.0",
+        "ora": "^8.0.0"
+    },
+    "devDependencies": {
+        "@types/better-sqlite3": "^7.6.0",
+        "@types/node": "^20.0.0",
+        "tsup": "^8.0.0",
+        "typescript": "^5.0.0"
+    }
+}
