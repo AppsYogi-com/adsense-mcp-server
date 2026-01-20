@@ -1,17 +1,81 @@
-# Google AdSense MCP Server
+# AdSense-MCP-Server
 
-A CLI-installable MCP (Model Context Protocol) server that enables Claude, Cursor, and other AI assistants to interact with your Google AdSense account.
+> Google AdSense MCP Server — Connect Google AdSense to Claude, Cursor, and other MCP clients.
+
+[![npm version](https://img.shields.io/npm/v/@appsyogi/adsense-mcp-server.svg)](https://www.npmjs.com/package/@appsyogi/adsense-mcp-server)
+[![npm downloads](https://img.shields.io/npm/dm/@appsyogi/adsense-mcp-server.svg)](https://www.npmjs.com/package/@appsyogi/adsense-mcp-server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/AppsYogi-com/adsense-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/AppsYogi-com/adsense-mcp-server/actions/workflows/ci.yml)
 
 ## Features
 
-- 📊 **Earnings Summary** - Quick overview of today, yesterday, last 7 days, and monthly earnings
-- 📈 **Detailed Reports** - Generate reports with dimensions (date, site, country, ad unit) and metrics
-- 🔄 **Period Comparison** - Compare performance between time periods
-- 🌐 **Site Status** - Check approval status for all your sites
-- ⚠️ **Alerts & Policy Issues** - Monitor account health and catch violations early
-- 💰 **Payment History** - View payment history and pending earnings
-- 📦 **Ad Units** - List ad units and get embed codes
-- 📤 **CSV Export** - Export reports for further analysis
+- 📊 **Earnings Summary** — Quick overview of today, yesterday, last 7 days, and monthly earnings
+- 📈 **Detailed Reports** — Generate reports with dimensions (date, site, country, ad unit) and metrics
+- 🔄 **Period Comparison** — Compare performance between time periods
+- 🌐 **Site Status** — Check approval status for all your sites
+- ⚠️ **Alerts & Policy Issues** — Monitor account health and catch violations early
+- 💰 **Payment History** — View payment history and pending earnings
+- 📦 **Ad Units** — List ad units and get embed codes
+- 📤 **CSV Export** — Export reports for further analysis
+- 💾 **Caching** — SQLite cache for faster repeated queries
+- 🔐 **Secure** — OAuth tokens stored in OS keychain, read-only scope
+
+## Quick Start
+
+```bash
+# Install globally
+npm install -g @appsyogi/adsense-mcp-server
+
+# Set up OAuth credentials
+adsense-mcp init
+
+# Verify setup
+adsense-mcp doctor
+
+# Start the server (for MCP clients)
+adsense-mcp run
+```
+
+## Prerequisites
+
+### 1. Create Google Cloud OAuth Credentials
+
+You need to create your own OAuth credentials in Google Cloud Console:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the **AdSense Management API**:
+   - Go to "APIs & Services" → "Library"
+   - Search for "AdSense Management API"
+   - Click "Enable"
+4. Create OAuth credentials:
+   - Go to "APIs & Services" → "Credentials"
+   - Click "Create Credentials" → "OAuth client ID"
+   - Choose "Desktop application"
+   - Name it (e.g., "AdSense-MCP")
+   - Click "Create"
+5. Copy the **Client ID** and **Client Secret**
+6. Add test users (required while app is in testing mode):
+   - Go to "APIs & Services" → "OAuth consent screen"
+   - Scroll to "Test users" section
+   - Click "Add users"
+   - Add the Google account email(s) you'll use to authenticate
+   - Click "Save"
+
+> **Note:** While your app's publishing status is "Testing", only test users can authenticate. You can add up to 100 test users.
+
+### 2. Configure AdSense-MCP
+
+Run the init command and enter your credentials:
+
+```bash
+adsense-mcp init
+```
+
+This will:
+- Prompt for your Client ID and Client Secret
+- Open a browser for Google authentication
+- Store your refresh token securely in the OS keychain
 
 ## Installation
 
@@ -201,10 +265,39 @@ Wait a minute and try again. The server will automatically retry with backoff.
 ### "Account not found" error
 Make sure you've selected a valid account during setup. Run `npx adsense-mcp doctor` to see available accounts.
 
+## Development
+
+```bash
+# Clone the repo
+git clone https://github.com/AppsYogi-com/adsense-mcp-server.git
+cd adsense-mcp-server
+
+# Install dependencies
+npm install
+
+# Build
+npm run build
+
+# Run in dev mode
+npm run dev
+
+# Test locally
+node dist/cli/index.js doctor
+```
+
 ## License
 
 MIT
 
 ## Contributing
 
-Contributions welcome! Please open an issue or PR on GitHub.
+Contributions are welcome! Please open an issue or PR.
+
+## Credits
+
+Built with:
+- [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk)
+- [googleapis](https://github.com/googleapis/google-api-nodejs-client)
+- [commander](https://github.com/tj/commander.js)
+- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3)
+- [keytar](https://github.com/atom/node-keytar)
