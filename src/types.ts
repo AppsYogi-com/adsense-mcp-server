@@ -108,6 +108,17 @@ export type ReportDimension =
     | 'AD_UNIT_NAME'
     | 'AD_UNIT_SIZE_CODE'
     | 'AD_UNIT_SIZE_NAME'
+    | 'ACCOUNT_NAME'
+    | 'AD_CLIENT_ID'
+    | 'HOSTED_AD_CLIENT_ID'
+    | 'PRODUCT_CODE'
+    | 'PRODUCT_NAME'
+    | 'REQUESTED_AD_TYPE_CODE'
+    | 'REQUESTED_AD_TYPE_NAME'
+    | 'SERVED_AD_TYPE_CODE'
+    | 'SERVED_AD_TYPE_NAME'
+    | 'CREATIVE_SIZE_CODE'
+    | 'CREATIVE_SIZE_NAME'
     | 'AD_FORMAT_CODE'
     | 'AD_FORMAT_NAME'
     | 'AD_PLACEMENT_CODE'
@@ -131,7 +142,17 @@ export type ReportDimension =
     | 'URL_CHANNEL_ID'
     | 'URL_CHANNEL_NAME'
     | 'OWNED_SITE_ID'
-    | 'OWNED_SITE_DOMAIN_NAME';
+    | 'OWNED_SITE_DOMAIN_NAME'
+    | 'CUSTOM_SEARCH_STYLE_ID'
+    | 'CUSTOM_SEARCH_STYLE_NAME'
+    | 'DOMAIN_REGISTRANT'
+    | 'WEBSEARCH_QUERY_STRING'
+    | 'OS_TYPE_CODE'
+    | 'OS_TYPE_NAME'
+    | 'BROWSER_TYPE_CODE'
+    | 'BROWSER_TYPE_NAME'
+    | 'WEBVIEW_TYPE_CODE'
+    | 'WEBVIEW_TYPE_NAME';
 
 export type ReportMetric =
     | 'ESTIMATED_EARNINGS'
@@ -164,7 +185,7 @@ export interface ReportQuery {
     endDate: string; // YYYY-MM-DD
     dimensions?: ReportDimension[];
     metrics?: ReportMetric[];
-    orderBy?: string;
+    orderBy?: string | string[];
     limit?: number;
     filters?: string[];
     currencyCode?: string;

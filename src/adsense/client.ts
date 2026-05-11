@@ -28,6 +28,171 @@ import type {
     EarningsPeriod,
 } from '../types.js';
 
+const REPORT_DIMENSIONS = new Set([
+    'DATE',
+    'WEEK',
+    'MONTH',
+    'ACCOUNT_NAME',
+    'AD_CLIENT_ID',
+    'HOSTED_AD_CLIENT_ID',
+    'PRODUCT_NAME',
+    'PRODUCT_CODE',
+    'DOMAIN_CODE',
+    'DOMAIN_NAME',
+    'PAGE_URL',
+    'AD_UNIT_ID',
+    'AD_UNIT_NAME',
+    'AD_UNIT_SIZE_CODE',
+    'AD_UNIT_SIZE_NAME',
+    'AD_FORMAT_CODE',
+    'AD_FORMAT_NAME',
+    'AD_PLACEMENT_CODE',
+    'AD_PLACEMENT_NAME',
+    'COUNTRY_CODE',
+    'COUNTRY_NAME',
+    'PLATFORM_TYPE_CODE',
+    'PLATFORM_TYPE_NAME',
+    'CONTENT_PLATFORM_CODE',
+    'CONTENT_PLATFORM_NAME',
+    'TRAFFIC_SOURCE_CODE',
+    'TRAFFIC_SOURCE_NAME',
+    'BUYER_NETWORK_ID',
+    'BUYER_NETWORK_NAME',
+    'BID_TYPE_CODE',
+    'BID_TYPE_NAME',
+    'TARGETING_TYPE_CODE',
+    'TARGETING_TYPE_NAME',
+    'CUSTOM_CHANNEL_ID',
+    'CUSTOM_CHANNEL_NAME',
+    'URL_CHANNEL_ID',
+    'URL_CHANNEL_NAME',
+    'OWNED_SITE_ID',
+    'OWNED_SITE_DOMAIN_NAME',
+    'REQUESTED_AD_TYPE_CODE',
+    'REQUESTED_AD_TYPE_NAME',
+    'SERVED_AD_TYPE_CODE',
+    'SERVED_AD_TYPE_NAME',
+    'CREATIVE_SIZE_CODE',
+    'CREATIVE_SIZE_NAME',
+    'CUSTOM_SEARCH_STYLE_ID',
+    'CUSTOM_SEARCH_STYLE_NAME',
+    'DOMAIN_REGISTRANT',
+    'WEBSEARCH_QUERY_STRING',
+    'OS_TYPE_CODE',
+    'OS_TYPE_NAME',
+    'BROWSER_TYPE_CODE',
+    'BROWSER_TYPE_NAME',
+    'WEBVIEW_TYPE_CODE',
+    'WEBVIEW_TYPE_NAME',
+]);
+
+const REPORT_METRICS = new Set([
+    'ESTIMATED_EARNINGS',
+    'TOTAL_EARNINGS',
+    'COST_PER_CLICK',
+    'PAGE_VIEWS',
+    'AD_REQUESTS',
+    'MATCHED_AD_REQUESTS',
+    'IMPRESSIONS',
+    'INDIVIDUAL_AD_IMPRESSIONS',
+    'CLICKS',
+    'AD_REQUESTS_COVERAGE',
+    'PAGE_VIEWS_CTR',
+    'AD_REQUESTS_CTR',
+    'IMPRESSIONS_CTR',
+    'PAGE_VIEWS_RPM',
+    'AD_REQUESTS_RPM',
+    'IMPRESSIONS_RPM',
+    'ACTIVE_VIEW_MEASURABILITY',
+    'ACTIVE_VIEW_VIEWABILITY',
+    'ACTIVE_VIEW_TIME',
+    'PAGE_VIEWS_SPAM_RATIO',
+    'AD_REQUESTS_SPAM_RATIO',
+    'CLICKS_SPAM_RATIO',
+    'IMPRESSIONS_SPAM_RATIO',
+]);
+
+const REPORT_FIELD_EXAMPLES = {
+    dimensions: 'COUNTRY_NAME, COUNTRY_CODE, PLATFORM_TYPE_CODE, or PLATFORM_TYPE_NAME',
+    metrics: 'ESTIMATED_EARNINGS, IMPRESSIONS, CLICKS, or PAGE_VIEWS_RPM',
+};
+
+function normalizeRepeatedEnum(
+    value: unknown,
+    fieldName: string,
+    allowedValues: Set<string>
+): string[] | undefined {
+    if (value === undefined || value === null) {
+        return undefined;
+    }
+
+    const rawValues = Array.isArray(value) ? value : [value];
+    const values = rawValues.flatMap(item =>
+        String(item)
+            .split(',')
+            .map(part => part.trim())
+            .filter(Boolean)
+    );
+
+    if (values.length === 0) {
+        return undefined;
+    }
+
+    const normalized = values.map(value => value.toUpperCase());
+    const invalid = normalized.filter(value => !allowedValues.has(value));
+
+    if (invalid.length > 0) {
+        const examples = REPORT_FIELD_EXAMPLES[fieldName as keyof typeof REPORT_FIELD_EXAMPLES];
+        throw new Error(
+            `Invalid report ${fieldName}: ${invalid.join(', ')}. Use AdSense v2 ${fieldName}${examples ? ` such as ${examples}` : ''}.`
+        );
+    }
+
+    return normalized;
+}
+
+function normalizeOrderBy(value: unknown): string[] | undefined {
+    if (value === undefined || value === null) {
+        return undefined;
+    }
+
+    const rawValues = Array.isArray(value) ? value : [value];
+    const values = rawValues.flatMap(item =>
+        String(item)
+            .split(',')
+            .map(part => part.trim())
+            .filter(Boolean)
+    );
+
+    if (values.length === 0) {
+        return undefined;
+    }
+
+    return values.map(value => {
+        const sqlStyleMatch = value.match(/^(.+?)\s+(ASC|DESC)$/i);
+        if (sqlStyleMatch) {
+            return `${sqlStyleMatch[2].toUpperCase() === 'DESC' ? '-' : '+'}${sqlStyleMatch[1].trim().toUpperCase()}`;
+        }
+
+        const prefix = value.startsWith('-') || value.startsWith('+') ? value[0] : '';
+        const column = prefix ? value.slice(1) : value;
+        return `${prefix}${column.trim().toUpperCase()}`;
+    });
+}
+
+function normalizeFilters(value: unknown): string[] | undefined {
+    if (value === undefined || value === null) {
+        return undefined;
+    }
+
+    const rawValues = Array.isArray(value) ? value : [value];
+    const values = rawValues
+        .map(item => String(item).trim())
+        .filter(Boolean);
+
+    return values.length > 0 ? values : undefined;
+}
+
 /**
  * AdSense API Client
  */
@@ -309,10 +474,22 @@ export class AdSenseClient {
     async generateReport(query: ReportQuery): Promise<ReportResponse> {
         const resolvedId = await this.resolveAccountId(query.accountId);
         const cache = getCache();
+        const dimensions = normalizeRepeatedEnum(query.dimensions, 'dimensions', REPORT_DIMENSIONS);
+        const metrics = normalizeRepeatedEnum(query.metrics, 'metrics', REPORT_METRICS);
+        const orderBy = normalizeOrderBy(query.orderBy);
+        const filters = normalizeFilters(query.filters);
+        const normalizedQuery = {
+            ...query,
+            accountId: resolvedId,
+            dimensions,
+            metrics,
+            orderBy,
+            filters,
+        };
 
         // Determine appropriate TTL based on date range
         const ttl = this.getReportTTL(query.startDate, query.endDate);
-        const cached = cache.get<ReportResponse>('report', { ...query, accountId: resolvedId });
+        const cached = cache.get<ReportResponse>('report', normalizedQuery);
 
         if (cached) {
             return cached;
@@ -333,12 +510,12 @@ export class AdSenseClient {
         };
 
         // Add dimensions
-        if (query.dimensions && query.dimensions.length > 0) {
-            params.dimensions = query.dimensions;
+        if (dimensions && dimensions.length > 0) {
+            params.dimensions = dimensions;
         }
 
         // Add metrics (default to basic earnings metrics)
-        params.metrics = query.metrics || [
+        params.metrics = metrics || [
             'ESTIMATED_EARNINGS',
             'IMPRESSIONS',
             'CLICKS',
@@ -347,11 +524,13 @@ export class AdSenseClient {
             'PAGE_VIEWS_RPM',
         ];
 
+        if (filters) {
+            params.filters = filters;
+        }
+
         // Add ordering
-        if (query.orderBy) {
-            params.orderBy = query.orderBy.startsWith('-')
-                ? `${query.orderBy.slice(1)} DESC`
-                : `${query.orderBy} ASC`;
+        if (orderBy) {
+            params.orderBy = orderBy;
         }
 
         // Add limit
@@ -364,7 +543,7 @@ export class AdSenseClient {
         );
 
         const report = response.data as ReportResponse;
-        cache.set('report', { ...query, accountId: resolvedId }, report, ttl, this.extractPubId(resolvedId));
+        cache.set('report', normalizedQuery, report, ttl, this.extractPubId(resolvedId));
 
         return report;
     }
@@ -374,6 +553,10 @@ export class AdSenseClient {
      */
     async generateCsvReport(query: ReportQuery): Promise<string> {
         const resolvedId = await this.resolveAccountId(query.accountId);
+        const dimensions = normalizeRepeatedEnum(query.dimensions, 'dimensions', REPORT_DIMENSIONS);
+        const metrics = normalizeRepeatedEnum(query.metrics, 'metrics', REPORT_METRICS);
+        const orderBy = normalizeOrderBy(query.orderBy);
+        const filters = normalizeFilters(query.filters);
 
         await rateLimiter.throttle();
 
@@ -388,16 +571,24 @@ export class AdSenseClient {
             'endDate.day': parseInt(query.endDate.split('-')[2]),
         };
 
-        if (query.dimensions) {
-            params.dimensions = query.dimensions;
+        if (dimensions) {
+            params.dimensions = dimensions;
         }
 
-        params.metrics = query.metrics || [
+        params.metrics = metrics || [
             'ESTIMATED_EARNINGS',
             'IMPRESSIONS',
             'CLICKS',
             'PAGE_VIEWS',
         ];
+
+        if (filters) {
+            params.filters = filters;
+        }
+
+        if (orderBy) {
+            params.orderBy = orderBy;
+        }
 
         const response = await withRetry(() =>
             this.adsense.accounts.reports.generateCsv(params)
