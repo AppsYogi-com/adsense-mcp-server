@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-12
+
+### Security
+- Fresh installs of 0.2.1 still had 5 moderate `npm audit` findings (`rimraf` → `glob` → `minimatch`). The cause was `googleapis-common` 8.0.2 and later, which pin `gaxios` to 7.1.3. This release pins `googleapis-common` to 8.0.1, which allows `gaxios` 7.3.1 without `rimraf`, so fresh installs audit clean while keeping Node.js 18 support. Remove the pin once `googleapis-common` drops the old `gaxios`, or when moving to `googleapis` 178+ (which requires Node.js 22).
+
 ## [0.2.1] - 2026-11-12
 
 ### Security
