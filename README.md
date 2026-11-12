@@ -198,9 +198,16 @@ npx adsense-mcp init
 # Set specific default account
 npx adsense-mcp init --account pub-1234567890123456
 
-# Use service account (advanced)
+# Use service account (AdSense for Platforms only, see note below)
 npx adsense-mcp init --service-account /path/to/key.json
+
+# Use a fixed port for the OAuth redirect (default: random free port)
+npx adsense-mcp init --port 8085
 ```
+
+> **Service accounts:** The AdSense Management API [doesn't support service accounts](https://developers.google.com/adsense/management/direct_requests) for regular AdSense accounts. They only work for [AdSense for Platforms](https://developers.google.com/adsense/platforms/api/authenticating-api-calls) accounts, after Google adds the service account to your AdSense account through your account manager. Everyone else should use OAuth (plain `init`). Running `init --service-account` replaces any existing OAuth setup.
+
+`init` starts a temporary local server on `http://127.0.0.1:<port>` and opens your browser. After you approve access, Google redirects back to that local server and the CLI saves your tokens. You don't need to copy or paste a code.
 
 ### `adsense-mcp doctor`
 Verify your setup and check account health.
@@ -258,6 +265,12 @@ The AdSense API has strict rate limits (100 requests/minute). This server:
 
 ### "No tokens found" error
 Run `npx adsense-mcp init` to set up authentication.
+
+### "The out-of-band (OOB) flow has been blocked" error
+Google has shut down the copy/paste (`urn:ietf:wg:oauth:2.0:oob`) OAuth flow. Upgrade to the latest version, which uses a local loopback redirect instead, then run `npx adsense-mcp init` again.
+
+### "redirect_uri_mismatch" error
+Your OAuth client must be of type **Desktop app**, which accepts any `http://127.0.0.1:<port>` redirect. If you have to use a **Web application** client, add `http://127.0.0.1:8085` as an authorized redirect URI and run `npx adsense-mcp init --port 8085`.
 
 ### "Rate limit exceeded" error
 Wait a minute and try again. The server will automatically retry with backoff.

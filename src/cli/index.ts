@@ -21,6 +21,7 @@ program
     .option('--client-id <id>', 'OAuth Client ID')
     .option('--client-secret <secret>', 'OAuth Client Secret')
     .option('--service-account <path>', 'Path to service account JSON key file')
+    .option('--port <number>', 'Local port for the OAuth redirect (default: random free port)')
     .action(async (options) => {
         await runInit(options);
     });
