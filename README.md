@@ -96,6 +96,8 @@ When everything passes, `doctor` also prints a ready-to-paste MCP config with th
 
 #### Claude Desktop
 
+> **Quit Claude Desktop before editing its config:** use ⌘Q on macOS, not just closing the window. While it's running, Claude Desktop keeps its own copy of this file and writes it back, so edits made with the app open can silently disappear. It also reads `mcpServers` only at startup.
+
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS, or `%APPDATA%\Claude\claude_desktop_config.json` on Windows. Add an `adsense` entry under `mcpServers`, keeping any servers already there.
 
 **Recommended: full paths.** Desktop apps don't load your shell's `PATH`, so `node` and `npx` from nvm, fnm or asdf often can't be found. This server also contains native modules built for one specific Node.js version.
@@ -129,7 +131,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS,
 }
 ```
 
-Quit Claude Desktop completely (⌘Q) and reopen it, then ask *"List my AdSense accounts"*.
+Save the file, open Claude Desktop, and ask *"List my AdSense accounts"*.
 
 #### Claude Code
 
@@ -332,7 +334,8 @@ The native modules were built for a different Node.js version than the one runni
 ### The server doesn't show up in Claude Desktop
 - Check the log: `~/Library/Logs/Claude/mcp-server-adsense.log` on macOS, or `%APPDATA%\Claude\logs\` on Windows.
 - `spawn node ENOENT` or `spawn npx ENOENT` means Claude Desktop can't find Node.js. Use [full paths](#claude-desktop).
-- After editing the config, quit Claude Desktop completely (⌘Q) before reopening it.
+- **Your `adsense` entry is gone from the config:** Claude Desktop overwrote the file while it was running. Quit it with ⌘Q, make sure it's no longer running, add the entry again, then reopen it.
+- **The entry is there but no tools appear:** Claude Desktop only loads servers at startup, so quit it completely (⌘Q) and reopen it.
 
 ### "No AdSense accounts found" / "Account not found"
 Sign in with the Google account that has access to AdSense. Run `adsense-mcp doctor` to see which accounts are found.
