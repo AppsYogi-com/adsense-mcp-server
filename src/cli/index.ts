@@ -7,13 +7,14 @@ import { Command } from 'commander';
 import { runInit } from './init.js';
 import { runDoctor } from './doctor.js';
 import { runServer } from './run.js';
+import { VERSION } from '../version.js';
 
 const program = new Command();
 
 program
     .name('adsense-mcp')
     .description('AdSense MCP Server - Query earnings, reports, alerts via Claude')
-    .version('0.1.0');
+    .version(VERSION);
 
 program
     .command('init')

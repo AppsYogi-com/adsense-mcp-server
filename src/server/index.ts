@@ -12,6 +12,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { registerTools, handleToolCall } from './tools/index.js';
 import { handleListResources, handleReadResource } from './resources/index.js';
+import { VERSION } from '../version.js';
 
 /**
  * Create and configure the MCP server
@@ -20,7 +21,7 @@ export function createServer() {
     const server = new Server(
         {
             name: 'adsense-mcp-server',
-            version: '0.1.0',
+            version: VERSION,
         },
         {
             capabilities: {
