@@ -1,6 +1,6 @@
 {
     "name": "@appsyogi/adsense-mcp-server",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Google AdSense MCP Server - Monitor earnings, reports, and account health via Claude/AI",
     "type": "module",
     "main": "./dist/index.js",
