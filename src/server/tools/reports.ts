@@ -91,6 +91,7 @@ export async function handleGenerateReport(args: Record<string, unknown>) {
         dimensions: (args.dimensions as ReportDimension[]) || undefined,
         metrics: (args.metrics as ReportMetric[]) || undefined,
         orderBy: (args.orderBy as string) || undefined,
+        filters: (args.filters as string[]) || undefined,
         limit: (args.limit as number) || 100,
     });
 

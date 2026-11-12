@@ -27,90 +27,10 @@ import type {
     EarningsSummary,
     EarningsPeriod,
 } from '../types.js';
+import { REPORT_DIMENSIONS, REPORT_METRICS } from '../types.js';
 
-const REPORT_DIMENSIONS = new Set([
-    'DATE',
-    'WEEK',
-    'MONTH',
-    'ACCOUNT_NAME',
-    'AD_CLIENT_ID',
-    'HOSTED_AD_CLIENT_ID',
-    'PRODUCT_NAME',
-    'PRODUCT_CODE',
-    'DOMAIN_CODE',
-    'DOMAIN_NAME',
-    'PAGE_URL',
-    'AD_UNIT_ID',
-    'AD_UNIT_NAME',
-    'AD_UNIT_SIZE_CODE',
-    'AD_UNIT_SIZE_NAME',
-    'AD_FORMAT_CODE',
-    'AD_FORMAT_NAME',
-    'AD_PLACEMENT_CODE',
-    'AD_PLACEMENT_NAME',
-    'COUNTRY_CODE',
-    'COUNTRY_NAME',
-    'PLATFORM_TYPE_CODE',
-    'PLATFORM_TYPE_NAME',
-    'CONTENT_PLATFORM_CODE',
-    'CONTENT_PLATFORM_NAME',
-    'TRAFFIC_SOURCE_CODE',
-    'TRAFFIC_SOURCE_NAME',
-    'BUYER_NETWORK_ID',
-    'BUYER_NETWORK_NAME',
-    'BID_TYPE_CODE',
-    'BID_TYPE_NAME',
-    'TARGETING_TYPE_CODE',
-    'TARGETING_TYPE_NAME',
-    'CUSTOM_CHANNEL_ID',
-    'CUSTOM_CHANNEL_NAME',
-    'URL_CHANNEL_ID',
-    'URL_CHANNEL_NAME',
-    'OWNED_SITE_ID',
-    'OWNED_SITE_DOMAIN_NAME',
-    'REQUESTED_AD_TYPE_CODE',
-    'REQUESTED_AD_TYPE_NAME',
-    'SERVED_AD_TYPE_CODE',
-    'SERVED_AD_TYPE_NAME',
-    'CREATIVE_SIZE_CODE',
-    'CREATIVE_SIZE_NAME',
-    'CUSTOM_SEARCH_STYLE_ID',
-    'CUSTOM_SEARCH_STYLE_NAME',
-    'DOMAIN_REGISTRANT',
-    'WEBSEARCH_QUERY_STRING',
-    'OS_TYPE_CODE',
-    'OS_TYPE_NAME',
-    'BROWSER_TYPE_CODE',
-    'BROWSER_TYPE_NAME',
-    'WEBVIEW_TYPE_CODE',
-    'WEBVIEW_TYPE_NAME',
-]);
-
-const REPORT_METRICS = new Set([
-    'ESTIMATED_EARNINGS',
-    'TOTAL_EARNINGS',
-    'COST_PER_CLICK',
-    'PAGE_VIEWS',
-    'AD_REQUESTS',
-    'MATCHED_AD_REQUESTS',
-    'IMPRESSIONS',
-    'INDIVIDUAL_AD_IMPRESSIONS',
-    'CLICKS',
-    'AD_REQUESTS_COVERAGE',
-    'PAGE_VIEWS_CTR',
-    'AD_REQUESTS_CTR',
-    'IMPRESSIONS_CTR',
-    'PAGE_VIEWS_RPM',
-    'AD_REQUESTS_RPM',
-    'IMPRESSIONS_RPM',
-    'ACTIVE_VIEW_MEASURABILITY',
-    'ACTIVE_VIEW_VIEWABILITY',
-    'ACTIVE_VIEW_TIME',
-    'PAGE_VIEWS_SPAM_RATIO',
-    'AD_REQUESTS_SPAM_RATIO',
-    'CLICKS_SPAM_RATIO',
-    'IMPRESSIONS_SPAM_RATIO',
-]);
+const DIMENSION_SET = new Set<string>(REPORT_DIMENSIONS);
+const METRIC_SET = new Set<string>(REPORT_METRICS);
 
 const REPORT_FIELD_EXAMPLES = {
     dimensions: 'COUNTRY_NAME, COUNTRY_CODE, PLATFORM_TYPE_CODE, or PLATFORM_TYPE_NAME',
@@ -474,8 +394,8 @@ export class AdSenseClient {
     async generateReport(query: ReportQuery): Promise<ReportResponse> {
         const resolvedId = await this.resolveAccountId(query.accountId);
         const cache = getCache();
-        const dimensions = normalizeRepeatedEnum(query.dimensions, 'dimensions', REPORT_DIMENSIONS);
-        const metrics = normalizeRepeatedEnum(query.metrics, 'metrics', REPORT_METRICS);
+        const dimensions = normalizeRepeatedEnum(query.dimensions, 'dimensions', DIMENSION_SET);
+        const metrics = normalizeRepeatedEnum(query.metrics, 'metrics', METRIC_SET);
         const orderBy = normalizeOrderBy(query.orderBy);
         const filters = normalizeFilters(query.filters);
         const normalizedQuery = {
@@ -553,8 +473,8 @@ export class AdSenseClient {
      */
     async generateCsvReport(query: ReportQuery): Promise<string> {
         const resolvedId = await this.resolveAccountId(query.accountId);
-        const dimensions = normalizeRepeatedEnum(query.dimensions, 'dimensions', REPORT_DIMENSIONS);
-        const metrics = normalizeRepeatedEnum(query.metrics, 'metrics', REPORT_METRICS);
+        const dimensions = normalizeRepeatedEnum(query.dimensions, 'dimensions', DIMENSION_SET);
+        const metrics = normalizeRepeatedEnum(query.metrics, 'metrics', METRIC_SET);
         const orderBy = normalizeOrderBy(query.orderBy);
         const filters = normalizeFilters(query.filters);
 

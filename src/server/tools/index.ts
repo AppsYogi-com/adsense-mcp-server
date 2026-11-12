@@ -14,56 +14,10 @@ import { handleListAlerts, handleListPolicyIssues } from './alerts.js';
 import { handleListPayments } from './payments.js';
 import { handleListAdUnits, handleGetAdCode } from './adUnits.js';
 import { handleExportCsv } from './export.js';
+import { REPORT_DIMENSIONS, REPORT_METRICS } from '../../types.js';
 
-const REPORT_DIMENSIONS = [
-    'DATE',
-    'WEEK',
-    'MONTH',
-    'DOMAIN_NAME',
-    'DOMAIN_CODE',
-    'PAGE_URL',
-    'AD_UNIT_NAME',
-    'AD_UNIT_ID',
-    'COUNTRY_NAME',
-    'COUNTRY_CODE',
-    'PLATFORM_TYPE_CODE',
-    'PLATFORM_TYPE_NAME',
-    'CONTENT_PLATFORM_CODE',
-    'CONTENT_PLATFORM_NAME',
-    'TRAFFIC_SOURCE_CODE',
-    'TRAFFIC_SOURCE_NAME',
-    'CUSTOM_CHANNEL_ID',
-    'CUSTOM_CHANNEL_NAME',
-    'OS_TYPE_CODE',
-    'OS_TYPE_NAME',
-    'BROWSER_TYPE_CODE',
-    'BROWSER_TYPE_NAME',
-    'AD_FORMAT_CODE',
-    'AD_FORMAT_NAME',
-    'AD_PLACEMENT_CODE',
-    'AD_PLACEMENT_NAME',
-];
-
-const REPORT_METRICS = [
-    'ESTIMATED_EARNINGS',
-    'TOTAL_EARNINGS',
-    'IMPRESSIONS',
-    'CLICKS',
-    'PAGE_VIEWS',
-    'PAGE_VIEWS_CTR',
-    'PAGE_VIEWS_RPM',
-    'AD_REQUESTS',
-    'MATCHED_AD_REQUESTS',
-    'AD_REQUESTS_COVERAGE',
-    'AD_REQUESTS_CTR',
-    'AD_REQUESTS_RPM',
-    'IMPRESSIONS_CTR',
-    'IMPRESSIONS_RPM',
-    'COST_PER_CLICK',
-    'ACTIVE_VIEW_MEASURABILITY',
-    'ACTIVE_VIEW_VIEWABILITY',
-    'ACTIVE_VIEW_TIME',
-];
+const DIMENSION_ENUM = [...REPORT_DIMENSIONS];
+const METRIC_ENUM = [...REPORT_METRICS];
 
 /**
  * Register all available tools
@@ -116,17 +70,22 @@ export function registerTools(): Tool[] {
                     },
                     dimensions: {
                         type: 'array',
-                        items: { type: 'string', enum: REPORT_DIMENSIONS },
+                        items: { type: 'string', enum: DIMENSION_ENUM },
                         description: 'Dimensions to group by. For country/platform reports use COUNTRY_NAME or COUNTRY_CODE with PLATFORM_TYPE_CODE or PLATFORM_TYPE_NAME. For custom channel reports use CUSTOM_CHANNEL_NAME or CUSTOM_CHANNEL_ID.',
                     },
                     metrics: {
                         type: 'array',
-                        items: { type: 'string', enum: REPORT_METRICS },
+                        items: { type: 'string', enum: METRIC_ENUM },
                         description: 'Metrics to include, such as ESTIMATED_EARNINGS, IMPRESSIONS, CLICKS, PAGE_VIEWS, PAGE_VIEWS_RPM, AD_REQUESTS, and AD_REQUESTS_COVERAGE.',
                     },
                     orderBy: {
                         type: 'string',
                         description: 'Dimension or metric to sort by. Prefix with - for descending or + for ascending, e.g. -ESTIMATED_EARNINGS.',
+                    },
+                    filters: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Filters as DIMENSION==value (exact match) or DIMENSION=@value (contains), e.g. COUNTRY_CODE==US. Separate entries are ANDed; use a comma inside one entry for OR (COUNTRY_CODE==US,COUNTRY_CODE==GB). Date dimensions cannot be filtered.',
                     },
                     limit: {
                         type: 'number',
@@ -164,7 +123,7 @@ export function registerTools(): Tool[] {
                     },
                     dimensions: {
                         type: 'array',
-                        items: { type: 'string', enum: REPORT_DIMENSIONS },
+                        items: { type: 'string', enum: DIMENSION_ENUM },
                         description: 'Dimensions to group by for comparison, e.g. COUNTRY_NAME, PLATFORM_TYPE_CODE, or CUSTOM_CHANNEL_NAME.',
                     },
                 },
@@ -293,13 +252,18 @@ export function registerTools(): Tool[] {
                     },
                     dimensions: {
                         type: 'array',
-                        items: { type: 'string', enum: REPORT_DIMENSIONS },
+                        items: { type: 'string', enum: DIMENSION_ENUM },
                         description: 'Dimensions to include, e.g. COUNTRY_NAME, PLATFORM_TYPE_CODE, or CUSTOM_CHANNEL_NAME.',
                     },
                     metrics: {
                         type: 'array',
-                        items: { type: 'string', enum: REPORT_METRICS },
+                        items: { type: 'string', enum: METRIC_ENUM },
                         description: 'Metrics to include.',
+                    },
+                    filters: {
+                        type: 'array',
+                        items: { type: 'string' },
+                        description: 'Filters as DIMENSION==value (exact match) or DIMENSION=@value (contains), e.g. COUNTRY_CODE==US. Separate entries are ANDed; use a comma inside one entry for OR (COUNTRY_CODE==US,COUNTRY_CODE==GB). Date dimensions cannot be filtered.',
                     },
                 },
                 required: ['startDate', 'endDate'],
