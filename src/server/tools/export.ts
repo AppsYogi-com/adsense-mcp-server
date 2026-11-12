@@ -27,6 +27,7 @@ export async function handleExportCsv(args: Record<string, unknown>) {
             endDate,
             dimensions: (args.dimensions as ReportDimension[]) || undefined,
             metrics: (args.metrics as ReportMetric[]) || undefined,
+            filters: (args.filters as string[]) || undefined,
         });
 
         return {
@@ -42,6 +43,7 @@ export async function handleExportCsv(args: Record<string, unknown>) {
             endDate,
             dimensions: (args.dimensions as ReportDimension[]) || undefined,
             metrics: (args.metrics as ReportMetric[]) || undefined,
+            filters: (args.filters as string[]) || undefined,
             limit: 10000,
         });
 
