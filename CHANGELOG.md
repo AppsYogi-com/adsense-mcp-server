@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- Upgraded `googleapis` from 140 to 176 and `google-auth-library` from 9 to 10, which clears every `npm audit` finding. The `uuid` buffer bounds advisory ([GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq)) affected the old `googleapis-common`. 176 is the newest `googleapis` that still supports Node.js 18; 178 and later require Node.js 22.
+- Applied `npm audit fix` to the lock file. Among other updates, this moves the MCP SDK to 1.32 and patches its HTTP server dependencies.
+
 ## [0.2.0] - 2026-11-12
 
 ### Fixed
